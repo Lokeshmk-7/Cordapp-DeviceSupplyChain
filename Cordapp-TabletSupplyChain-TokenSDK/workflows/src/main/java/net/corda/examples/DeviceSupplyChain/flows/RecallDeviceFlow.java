@@ -9,6 +9,7 @@ import net.corda.core.contracts.StateAndRef;
 import net.corda.core.flows.*;
 import net.corda.core.identity.Party;
 import net.corda.core.transactions.SignedTransaction;
+import net.corda.examples.DeviceSupplyChain.states.MicroscopeToken;
 
 public class RecallDeviceFlow {
 
@@ -29,19 +30,19 @@ public class RecallDeviceFlow {
         @Override
         public String call() throws FlowException {
 
-            StateAndRef<TabletToken> frameStateAndRef = getServiceHub().getVaultService()
-                    .queryBy(TabletToken.class).getStates().stream()
+            StateAndRef<MicroscopeToken> frameStateAndRef = getServiceHub().getVaultService()
+                    .queryBy(MicroscopeToken.class).getStates().stream()
                     .filter(sf -> sf.getState().getData().getName().equals(this.name)).findAny()
                     .orElseThrow(()->new IllegalArgumentException("StockState symbol=\"" + this.name + "\" not found from vault"));
 
-            TabletToken tabletToken = frameStateAndRef.getState().getData();
-            Party issuer = tabletToken.getIssuer();
+            MicroscopeToken deviceToken = frameStateAndRef.getState().getData();
+            Party issuer = deviceToken.getIssuer();
 
-            TokenPointer tokenPointer = tabletToken.toPointer(tabletToken.getClass());
+            TokenPointer tokenPointer = deviceToken.toPointer(deviceToken.getClass());
 
             SignedTransaction st = subFlow(new RedeemNonFungibleTokens(tokenPointer, issuer));
 
-            return "\nThe tablet is totaled, and the token is redeem to PharmaCo" + "\nTransaction ID: " + st.getId();
+            return "\nThe device is totaled, and the token is redeem to PharmaCo" + "\nTransaction ID: " + st.getId();
         }
     }
 

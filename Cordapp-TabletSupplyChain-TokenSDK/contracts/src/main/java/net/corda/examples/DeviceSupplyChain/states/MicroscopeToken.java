@@ -5,7 +5,6 @@ import net.corda.core.contracts.BelongsToContract;
 import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.identity.Party;
 import net.corda.examples.DeviceSupplyChain.contracts.MicroscopeContract;
-import net.corda.examples.DeviceSupplyChain.contracts.TabletContract;
 import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.List;

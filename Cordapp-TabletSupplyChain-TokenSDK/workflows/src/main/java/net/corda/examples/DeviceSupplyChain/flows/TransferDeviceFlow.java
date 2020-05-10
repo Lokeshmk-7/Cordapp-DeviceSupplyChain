@@ -10,30 +10,27 @@ import net.corda.core.contracts.StateAndRef;
 import net.corda.core.flows.*;
 import net.corda.core.identity.Party;
 import net.corda.core.transactions.SignedTransaction;
+import net.corda.examples.DeviceSupplyChain.states.MicroscopeToken;
 
-public class TransferTabletFlow {
+public class TransferDeviceFlow {
 
-    public TransferTabletFlow() {
+    public TransferDeviceFlow() {
     }
 
     @InitiatingFlow
     @StartableByRPC
-    public static class TransferTabletToken extends FlowLogic<String> {
+    public static class TransferDeviceToken extends FlowLogic<String> {
 
         private final String name;
         private final String batchno;
         private final int dom;
-        private final int doe;
-        private final int quantity;
         private final int amount;
         private final Party holder;
 
-        public TransferTabletToken(String name, String batchno, int dom, int doe, int quantity, int amount, Party holder) {
+        public TransferDeviceToken(String name, String batchno, int dom, int amount, Party holder) {
             this.name = name;
             this.batchno = batchno;
             this.dom = dom;
-            this.doe = doe;
-            this.quantity = quantity;
             this.amount = amount;
             this.holder = holder;
         }
@@ -42,33 +39,33 @@ public class TransferTabletFlow {
         @Override
         public String call() throws FlowException {
 
-            StateAndRef<TabletToken> frameStateandRef = getServiceHub().getVaultService()
-                    .queryBy(TabletToken.class).getStates().stream()
+            StateAndRef<MicroscopeToken> frameStateandRef = getServiceHub().getVaultService()
+                    .queryBy(MicroscopeToken.class).getStates().stream()
                     .filter(sf -> sf.getState().getData().getName().equals(this.name)).findAny()
                     .orElseThrow(() -> new IllegalArgumentException("StockState symbol=\"" + this.name + "\" not found from vault"));
 
-            TabletToken tabletTokenState = frameStateandRef.getState().getData();
+            MicroscopeToken deviceTokenState = frameStateandRef.getState().getData();
 
-            TokenPointer tabletTokenPointer = tabletTokenState.toPointer(tabletTokenState.getClass());
+            TokenPointer deviceTokenPointer = deviceTokenState.toPointer(deviceTokenState.getClass());
 
-            PartyAndToken partyAndToken = new PartyAndToken(holder, tabletTokenPointer);
+            PartyAndToken partyAndToken = new PartyAndToken(holder, deviceTokenPointer);
 
             SignedTransaction stx = (SignedTransaction) subFlow(new MoveNonFungibleTokens(partyAndToken));
 
 
-            return "\nTransfer ownership of a tablet name: "+ this.name + " to "
+            return "\nTransfer ownership of a device name: "+ this.name + " to "
                     + this.holder.getName().getOrganisation() + "\nTransaction IDs: "
                     + stx.getId();
         }
     }
 
 
-    @InitiatedBy(TransferTabletToken.class)
-    public static class TransferTabletTokenResponder extends FlowLogic<Unit>{
+    @InitiatedBy(TransferDeviceFlow.TransferDeviceToken.class)
+    public static class TransferDeviceTokenResponder extends FlowLogic<Unit>{
 
         private FlowSession counterSession;
 
-        public TransferTabletTokenResponder(FlowSession counterSession) {
+        public TransferDeviceTokenResponder(FlowSession counterSession) {
             this.counterSession = counterSession;
         }
 

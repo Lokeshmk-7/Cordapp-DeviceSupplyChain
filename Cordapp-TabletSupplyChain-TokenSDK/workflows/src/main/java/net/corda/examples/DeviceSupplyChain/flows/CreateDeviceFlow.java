@@ -7,23 +7,20 @@ import net.corda.core.flows.FlowException;
 import net.corda.core.flows.FlowLogic;
 import net.corda.core.flows.StartableByRPC;
 import net.corda.core.identity.Party;
+import net.corda.examples.DeviceSupplyChain.states.MicroscopeToken;
 
 @StartableByRPC
-public class CreateTabletTokenFlow extends FlowLogic<String>{
+public class CreateDeviceFlow extends FlowLogic<String> {
 
     private final String name;
     private final String batchno;
     private final int dom;
-    private final int doe;
-    private final int quantity;
     private final int amount;
 
-    public CreateTabletTokenFlow(String name, String batchno, int dom, int doe, int quantity, int amount) {
+    public CreateDeviceFlow(String name, String batchno, int dom, int amount) {
         this.name = name;
         this.batchno = batchno;
         this.dom = dom;
-        this.doe = doe;
-        this.quantity = quantity;
         this.amount = amount;
     }
 
@@ -36,13 +33,14 @@ public class CreateTabletTokenFlow extends FlowLogic<String>{
 
         //Create non-fungible TabletToken
         UniqueIdentifier uuid = new UniqueIdentifier();
-        TabletToken tabletToken = new TabletToken(this.name, this.batchno, this.dom, this.doe, this.quantity, this.amount, getOurIdentity(), uuid, 0);
+        MicroscopeToken microscopeToken = new MicroscopeToken(this.name, this.batchno, this.dom, this.amount, getOurIdentity(), uuid, 0);
 
-        TransactionState transactionState = new TransactionState(tabletToken, notary);
+        TransactionState transactionState = new TransactionState(microscopeToken, notary);
 
         //Calling subflow to create Evolvable Token
         subFlow(new CreateEvolvableTokens(transactionState));
 
-        return "\nA new tablet batch is being built of Batch Number " + this.batchno;
+        return "\nA new device is being built of batch Number " + this.batchno;
     }
+
 }
