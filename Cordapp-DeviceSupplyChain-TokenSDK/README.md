@@ -49,7 +49,7 @@ Now we can check at the Customer's node shell to see if the Customer recieves th
 
 At the Customer side, we would assume we got a recall notice and will send the physical device back to the manufacturer. The action will happen in real life, but on the ledger we will also need to "destroy"(process of redeem in Corda TokenSDK) the device token. Run:
 ```
-flow start TotalPart name: Microscope
+flow start RecallDeviceFlow name: Microscope
 ```
 At the Customer 's shell, if we do the `vaultQuery` again, we will see that the device token is gone. 
 
